@@ -33,7 +33,7 @@ test('Test case 3: Negative password test using page object model', async ({ pag
   await loginPage.expectErrorText('Your password is invalid!');
 });
 
-test('Test case 4: Verify Shop now is visible using page object model', async ({ page }) => {
+test('Test case 04: Verify Shop now is visible using page object model', async ({ page }) => {
   const practiceAppPage = new PracticeAppPage(page);
 
   await practiceAppPage.goto();
