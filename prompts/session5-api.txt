@@ -1,0 +1,59 @@
+Session 5 - Prompts used to generate API CRUD tests
+====================================================
+
+Target API: https://api.restful-api.dev (free public CRUD playground)
+Test framework: Playwright Test (@playwright/test) with the `request` fixture
+Spec file:    tests/api-assignments.spec.ts
+
+----------------------------------------------------
+Prompt 1 - Plan the test suite
+----------------------------------------------------
+"Create Playwright API tests against https://api.restful-api.dev/objects
+covering GET (list), POST (create), GET (by id), PUT (full update),
+PATCH (partial update), and DELETE. Use the built-in `request` fixture,
+group the tests in a single `test.describe` block, and chain them via a
+shared `createdId` variable so the create/read/update/delete flow uses
+the same record."
+
+----------------------------------------------------
+Prompt 2 - Assertions style
+----------------------------------------------------
+"For each call assert:
+ - HTTP status code (200 on success, 404 after delete)
+ - response shape: `id`, `name`, and nested `data` fields
+ - the value actually changed where it should (PUT vs PATCH)
+Use response.json() and expect().toHaveProperty for shape checks."
+
+----------------------------------------------------
+Prompt 3 - Sample payload
+----------------------------------------------------
+"Use a realistic laptop payload for create:
+  { name: 'Playwright Test Laptop',
+    data: { year: 2026, price: 1999.99,
+            'CPU model': 'Intel Core i9',
+            'Hard disk size': '1 TB' } }
+On PUT replace it with a 2027 model; on PATCH only change the name."
+
+----------------------------------------------------
+Prompt 4 - Cleanup verification
+----------------------------------------------------
+"After DELETE, issue a follow-up GET by id and assert status 404
+to confirm the resource is actually gone, not just that the delete
+endpoint returned 200."
+
+----------------------------------------------------
+Prompt 5 - File location
+----------------------------------------------------
+"Place the spec in tests/api-assignments.spec.ts and keep BASE_URL as
+a module-level constant so it can be swapped via env var later."
+
+----------------------------------------------------
+Notes / lessons learned
+----------------------------------------------------
+- restful-api.dev returns 200 (not 201) on POST.
+- DELETE response body contains a `message` string that includes the id.
+- Tests share state via a module-level `createdId`. Because the project
+  config has `fullyParallel: true`, individual tests in a file are
+  scheduled across workers, breaking the shared variable. The fix is
+  `test.describe.configure({ mode: 'serial' })` at the top of the spec.
+- No auth headers are required for restful-api.dev.
